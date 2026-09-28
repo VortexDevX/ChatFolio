@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "GPT-PDF Studio — Precision ChatGPT Exporter",
+  "version": "2.0.0",
+  "description": "Select individual message bubbles in ChatGPT and export to publication-grade vector PDFs with KaTeX math & privacy redaction.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GPT-PDF Studio"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

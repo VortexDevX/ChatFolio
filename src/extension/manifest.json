@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "GPT-PDF — Export ChatGPT to PDF",
+  "version": "2.0.0",
+  "description": "Convert ChatGPT conversations into publication-grade vector PDFs with selective message bubbles, KaTeX math, and privacy redaction.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "GPT-PDF Studio"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": ["src/extension/contentScript.ts"],
+      "run_at": "document_idle"
+    }
+  ]
+}

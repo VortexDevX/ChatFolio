@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GPT-PDF Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #090d16;
+      color: #f1f5f9;
+      padding: 16px;
+      border: 1px solid #1e293b;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .logo-badge {
+      width: 28px;
+      height: 28px;
+      background: #10b981;
+      color: #090d16;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+    .title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      margin-bottom: 8px;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: #10b981;
+      color: #090d16;
+    }
+    .btn-primary:hover {
+      background: #34d399;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+    }
+    .btn-secondary:hover {
+      background: #273549;
+    }
+    .footer {
+      margin-top: 8px;
+      font-size: 10px;
+      color: #475569;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-badge">⚡</div>
+    <div>
+      <div class="title">GPT-PDF Studio</div>
+      <div class="subtitle">Precision Vector PDF Exporter</div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="openStudio">
+    🚀 Open Studio (localhost:8000)
+  </button>
+  
+  <button class="btn btn-secondary" id="selectBubbles">
+    🎯 Toggle In-Page Bubble Select
+  </button>
+
+  <button class="btn btn-secondary" id="copyJson">
+    📋 Copy Chat Data to Clipboard
+  </button>
+
+  <div class="footer">
+    Works on chatgpt.com & chat.openai.com
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
