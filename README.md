@@ -1,15 +1,6 @@
-# 📖 ChatFolio Studio
-
 <div align="center">
 
-<!-- prettier-ignore -->
-```text
-   ____ _           _   _____     _ _
-  / ___| |__   __ _| |_|  ___|__ | (_) ___
- | |   | '_ \ / _' | __| |_ / _ \| | |/ _ \
- | |___| | | | (_| | |_|  _| (_) | | | (_) |
-  \____|_| |_|\__,_|\__|_|  \___/|_|_|\___/
-```
+# 📖 ChatFolio Studio
 
 **The Editorial AI Publishing Studio**  
 _Transform AI conversations into publication-grade folios, monographs, and vector PDFs with live typography, native KaTeX math, and custom editorial finishes._
