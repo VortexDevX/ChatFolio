@@ -516,6 +516,39 @@ export const ExportDrawer: React.FC<ExportDrawerProps> = ({
                     </div>
                   </div>
 
+                  {/* Page Break Flow */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+                      Page Break Flow
+                    </label>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {(
+                        [
+                          { id: 'message', label: 'Per Message', desc: 'Fresh page/msg' },
+                          { id: 'pair', label: 'Per Q&A Turn', desc: 'Prompt + answer' },
+                          { id: 'continuous', label: 'Continuous', desc: 'Natural flow' },
+                        ] as { id: NonNullable<ExportOptions['page_break_mode']>; label: string; desc: string }[]
+                      ).map((pb) => {
+                        const isSelected = (options.page_break_mode || 'message') === pb.id;
+                        return (
+                          <div
+                            key={pb.id}
+                            onClick={() => updateOpt('page_break_mode', pb.id)}
+                            className={cn(
+                              'p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1',
+                              isSelected
+                                ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-white font-semibold shadow-xs'
+                                : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                            )}
+                          >
+                            <span className="text-xs font-semibold">{pb.label}</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">{pb.desc}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Elements Toggles */}
                   <div>
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-3">
@@ -531,7 +564,7 @@ export const ExportDrawer: React.FC<ExportDrawerProps> = ({
                           </div>
                         </div>
                         <Toggle
-                          checked={options.show_thoughts ?? true}
+                          checked={options.show_thoughts ?? false}
                           onChange={(val) => updateOpt('show_thoughts', val)}
                         />
                       </div>

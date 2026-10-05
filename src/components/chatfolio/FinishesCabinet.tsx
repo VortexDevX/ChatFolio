@@ -369,11 +369,11 @@ export const FinishesCabinet: React.FC<FinishesCabinetProps> = ({
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: 'continuous', label: 'Continuous', desc: 'Flow naturally' },
-                  { id: 'pair', label: 'Per Q&A Turn', desc: 'Fresh page/turn' },
                   { id: 'message', label: 'Per Message', desc: 'Fresh page/msg' },
+                  { id: 'pair', label: 'Per Q&A Turn', desc: 'Prompt + answer' },
+                  { id: 'continuous', label: 'Continuous', desc: 'Flow naturally' },
                 ].map((pb) => {
-                  const isSelected = (options.page_break_mode || 'pair') === pb.id;
+                  const isSelected = (options.page_break_mode || 'message') === pb.id;
                   return (
                     <button
                       key={pb.id}
@@ -396,10 +396,10 @@ export const FinishesCabinet: React.FC<FinishesCabinetProps> = ({
               </div>
               <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5 italic">
                 {options.page_break_mode === 'pair'
-                  ? 'Starts each new prompt/question on a fresh page. Responses flow directly below.'
-                  : options.page_break_mode === 'message'
-                  ? 'Starts each prompt and each assistant response on its own clean page.'
-                  : 'Manuscript flows continuously without forced blank breaks.'}
+                  ? 'Keeps each prompt and its response together on a page, breaking before the next question.'
+                  : options.page_break_mode === 'continuous'
+                  ? 'Manuscript flows continuously without forced blank breaks.'
+                  : 'Starts each prompt and each assistant response on its own clean page.'}
               </p>
             </div>
           </div>

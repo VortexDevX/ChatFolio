@@ -37,16 +37,16 @@ def test_build_document_html_escapes_xss():
 
 
 def test_margin_css_calculation():
-    # @page rule uses margin 0 and background var(--bg) to ensure edge-to-edge color without white borders
-    assert "margin: 0" in get_margin_css("narrow", "A4")
-    assert "background: var(--bg)" in get_margin_css("normal", "A4")
+    # @page rule uses real margins to properly support multi-page responses
+    assert "10mm 10mm 10mm 10mm" in get_margin_css("narrow", "A4")
+    assert "16mm 14mm 16mm 14mm" in get_margin_css("normal", "A4")
     assert "letter portrait" in get_margin_css("normal", "Letter")
     assert "auto" in get_margin_css("normal", "Continuous")
 
     # Content margins are passed to body via --page-padding variable
     sample_chat = {"title": "Test", "messages": [{"id": "1", "role": "user", "content": "Hi"}]}
     narrow_html = build_document_html(sample_chat, options={"margins": "narrow"})
-    assert "--page-padding: 8mm 8mm 8mm 8mm" in narrow_html
+    assert "--page-padding: 10mm 10mm 10mm 10mm" in narrow_html
 
     wide_html = build_document_html(sample_chat, options={"margins": "wide"})
     assert "--page-padding: 24mm 20mm 24mm 20mm" in wide_html
@@ -189,16 +189,19 @@ def test_page_break_modes_and_print_hardening():
     assert '<article class="turn turn-ai page-break-before" data-turn-id="msg-4">' in html_message
 
     # 4. Print engine hardening and default flow verification
-    assert "orphans: 4" in html_continuous
-    assert "widows: 4" in html_continuous
+    assert "orphans: 3" in html_continuous
+    assert "widows: 3" in html_continuous
+    assert "box-decoration-break: clone" in html_continuous
     assert "break-before: page !important" in html_continuous
     assert "--page-top-margin:" in html_continuous
     assert "Published with ChatFolio Studio" in html_continuous
     assert "ChatFolio Publication" in html_continuous
 
-    # 5. Defaults: pair mode and editorial theme are default
+    # 5. Defaults: message mode, show_thoughts: False, and editorial theme are default
     html_default = build_document_html(chat_data)
     assert 'data-theme="editorial"' in html_default
     assert '<div class="page-break-spacer" aria-hidden="true"></div>' in html_default
+    assert '<article class="turn turn-ai page-break-before" data-turn-id="msg-2">' in html_default
     assert '<article class="turn turn-user page-break-before" data-turn-id="msg-3">' in html_default
+    assert '<article class="turn turn-ai page-break-before" data-turn-id="msg-4">' in html_default
 

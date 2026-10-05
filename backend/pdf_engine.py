@@ -184,24 +184,30 @@ THEME_PALETTES: Dict[str, Dict[str, str]] = {
 }
 
 MARGIN_MAP = {
-    "narrow": {"a4": "8mm 8mm 8mm 8mm", "letter": "0.35in 0.35in 0.35in 0.35in", "continuous": "6mm", "top": "12mm"},
-    "normal": {"a4": "16mm 14mm 16mm 14mm", "letter": "0.65in 0.55in 0.65in 0.55in", "continuous": "12mm", "top": "18mm"},
-    "wide": {"a4": "24mm 20mm 24mm 20mm", "letter": "0.95in 0.85in 0.95in 0.85in", "continuous": "18mm", "top": "26mm"},
+    "narrow": {"a4": "10mm 10mm 10mm 10mm", "letter": "0.4in 0.4in 0.4in 0.4in", "continuous": "6mm", "top": "10mm"},
+    "normal": {"a4": "16mm 14mm 16mm 14mm", "letter": "0.65in 0.55in 0.65in 0.55in", "continuous": "12mm", "top": "16mm"},
+    "wide": {"a4": "24mm 20mm 24mm 20mm", "letter": "0.95in 0.85in 0.95in 0.85in", "continuous": "18mm", "top": "24mm"},
 }
 
 
 def get_margin_css(margins: str = "normal", paper_size: str = "A4") -> str:
-    """Return CSS @page rule with zero margin and theme background so body background bleeds edge-to-edge.
+    """Return CSS @page rule with proper page margins.
 
-    Content spacing is handled by body padding via the --page-padding CSS variable.
-    This ensures dark-themed PDFs don't have white borders around any page.
+    Chromium headless prints background colors edge-to-edge across the entire page,
+    while @page margins properly position content on every page (including multi-page continuations).
     """
+    cur_margin = MARGIN_MAP.get(margins, MARGIN_MAP["normal"])
     if paper_size == "Letter":
-        return "@page { size: letter portrait; margin: 0; background: var(--bg); }"
+        margin_val = cur_margin["letter"]
+        size_val = "letter portrait"
     elif paper_size == "Continuous":
-        return "@page { size: auto; margin: 0; background: var(--bg); }"
+        margin_val = cur_margin["continuous"]
+        size_val = "auto"
     else:
-        return "@page { size: A4 portrait; margin: 0; background: var(--bg); }"
+        margin_val = cur_margin["a4"]
+        size_val = "A4 portrait"
+
+    return f"@page {{ size: {size_val}; margin: {margin_val}; }}"
 
 
 def build_document_html(
@@ -226,12 +232,12 @@ def build_document_html(
     safe_author = html.escape(str(author_tag)) if author_tag else ""
     watermark = opts.get("watermark") or ""
     safe_watermark = html.escape(str(watermark)) if watermark else ""
-    show_thoughts = opts.get("show_thoughts", True)
+    show_thoughts = opts.get("show_thoughts", False)
     show_user_msgs = opts.get("show_user_msgs", True)
     show_ai_msgs = opts.get("show_ai_msgs", True)
     show_line_numbers = opts.get("show_line_numbers", True)
     show_metadata_banner = opts.get("show_metadata_banner", True)
-    page_break_mode = opts.get("page_break_mode", "pair")
+    page_break_mode = opts.get("page_break_mode", "message")
     
     if selected_message_ids is None:
         selected_ids_opt = opts.get("selected_ids")
@@ -626,6 +632,8 @@ def build_document_html(
             margin-bottom: 1.6rem;
             break-inside: auto;
             page-break-inside: auto;
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
             position: relative;
         }}
 
@@ -913,39 +921,27 @@ def build_document_html(
                 print-color-adjust: exact !important;
             }}
             body {{
-                padding: var(--page-padding) !important;
+                padding: 0 !important;
+                margin: 0 !important;
                 background-color: var(--bg) !important;
             }}
-            .page-break-spacer {{
-                display: block !important;
-                break-before: page !important;
-                page-break-before: always !important;
-                height: var(--page-top-margin, 18mm) !important;
-                min-height: var(--page-top-margin, 18mm) !important;
+            .doc-container {{
+                max-width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                border: none !important;
-                background: transparent !important;
-                visibility: hidden !important;
             }}
-            .page-break-spacer::after {{
+            .page-break-spacer {{
                 display: none !important;
-            }}
-            .page-break-spacer + .turn {{
-                break-before: avoid !important;
-                page-break-before: avoid !important;
             }}
             .page-break-before {{
                 break-before: page !important;
                 page-break-before: always !important;
             }}
-            .page-break-spacer + .page-break-before {{
-                break-before: avoid !important;
-                page-break-before: avoid !important;
-            }}
             .turn {{
                 break-inside: auto !important;
                 page-break-inside: auto !important;
+                -webkit-box-decoration-break: clone !important;
+                box-decoration-break: clone !important;
             }}
             .turn-header {{
                 break-inside: avoid !important;
@@ -965,6 +961,8 @@ def build_document_html(
             .thought-container {{
                 break-inside: auto !important;
                 page-break-inside: auto !important;
+                -webkit-box-decoration-break: clone !important;
+                box-decoration-break: clone !important;
             }}
             .thought-badge {{
                 break-inside: avoid !important;
@@ -984,10 +982,12 @@ def build_document_html(
             .markdown-body blockquote {{
                 break-inside: avoid !important;
                 page-break-inside: avoid !important;
+                -webkit-box-decoration-break: clone !important;
+                box-decoration-break: clone !important;
             }}
             p, li, blockquote {{
-                orphans: 4 !important;
-                widows: 4 !important;
+                orphans: 3 !important;
+                widows: 3 !important;
             }}
         }}
     </style>
@@ -1063,6 +1063,7 @@ def render_pdf_from_html(
         tmp.write(html_content)
         tmp_html_path = Path(tmp.name).resolve()
 
+    tmp_user_dir = tempfile.mkdtemp(prefix="chatfolio_browser_")
     try:
         # Edge / Chromium headless print command
         cmd = [
@@ -1072,8 +1073,8 @@ def render_pdf_from_html(
             "--no-sandbox",
             "--disable-dev-shm-usage",
             "--no-pdf-header-footer",
+            f"--user-data-dir={tmp_user_dir}",
             "--run-all-compositor-stages-before-draw",
-            "--virtual-time-budget=2000",
             f"--print-to-pdf={str(out_path)}",
             tmp_html_path.as_uri(),
         ]
@@ -1090,7 +1091,7 @@ def render_pdf_from_html(
             raise RuntimeError(f"Edge/Chrome headless PDF rendering timed out after {timeout_sec} seconds.")
 
         # Allow filesystem flush
-        time.sleep(0.5)
+        time.sleep(0.3)
 
         if not out_path.exists() or out_path.stat().st_size == 0:
             err = result.stderr.decode("utf-8", errors="ignore")
@@ -1101,5 +1102,9 @@ def render_pdf_from_html(
         try:
             if tmp_html_path.exists():
                 tmp_html_path.unlink()
+        except Exception:
+            pass
+        try:
+            shutil.rmtree(tmp_user_dir, ignore_errors=True)
         except Exception:
             pass
